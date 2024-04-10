@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:latest
+    environment:
+      - "MONGO_INITDB_DATABASE=main"
+      - "MONGO_INITDB_ROOT_PASSWORD=resu"
+      - "MONGO_INITDB_ROOT_USERNAME=user"
+    ports:
+      - '27017'
+

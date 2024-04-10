@@ -2,7 +2,9 @@ package fr.univrouen.cv24;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+@EnableMongoRepositories({"fr.univrouen.cv24.repository"})
 @SpringBootApplication
 public class Cv24v1Application {
 

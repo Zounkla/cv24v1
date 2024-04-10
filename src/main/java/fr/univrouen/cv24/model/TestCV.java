@@ -1,27 +1,30 @@
 package fr.univrouen.cv24.model;
 
 import jakarta.xml.bind.annotation.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
 
-@XmlRootElement(name = "TestCV")
-@XmlAccessorType(XmlAccessType.NONE)
+@Document(collection = "CV")
 public class TestCV implements Serializable {
     private static final long serialVersionUID = 2024L;
     private static int compteur = 1;
 
-    @XmlAttribute
+    @Id
     private Integer id;
 
-    @XmlElement
+    @Field(value="name")
     private String nom;
 
-    @XmlElement
+    @Field(value="prenom")
     private String prenom;
-    @XmlElement
+
+    @Field(value="date")
     private String date;
 
-    @XmlElement
+    @Field(value="mel")
     private String mel;
 
     public TestCV(String nom, String prenom, String date, String mel) {
