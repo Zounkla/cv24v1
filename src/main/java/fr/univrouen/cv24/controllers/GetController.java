@@ -35,19 +35,16 @@ public class GetController {
         return Fichier.loadFileXML();
     }
 
-    @RequestMapping(value = "/testxml", produces = MediaType.APPLICATION_XML_VALUE)
-    public @ResponseBody TestCV getXML() {
-        return new TestCV("HAMILTON", "Margaret", "1969/07/21",
-                "Appollo11@nasa.us");
-    }
 
     @GetMapping("/testInsert")
     public String testInsert() {
+        TestCV maxCV = testCVRepository.findTopByOrderByIdDesc();
+        Integer id = maxCV == null ? 1 : maxCV.getId() + 1;
         String name = "Louis";
         String firstName = "Jean";
         String date = "today";
         String mel = "Jean.Louis@gmail.com";
-        TestCV testCV = new TestCV(name, firstName, date, mel);
+        TestCV testCV = new TestCV(id, name, firstName, date, mel);
 
         this.testCVRepository.insert(testCV);
 
