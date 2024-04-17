@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
-@Component
 @Document(collection = "CV")
 public class TestCV implements Serializable {
     private static final long serialVersionUID = 2024L;
