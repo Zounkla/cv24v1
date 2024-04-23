@@ -8,5 +8,9 @@ services:
       - "MONGO_INITDB_ROOT_PASSWORD=resu"
       - "MONGO_INITDB_ROOT_USERNAME=user"
     ports:
-      - '27017'
+      - '27017:27017'
+    volumes:
+      - data-vol:/data/db
 
+volumes:
+  data-vol:
