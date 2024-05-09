@@ -45,7 +45,7 @@
   <!--Optional:-->
   <cv24:divers>
     <!--1 to 5 repetitions:-->
-    <cv24:lv lang="fr" cert="CLES" nivs="C2"/>
+    <cv24:lv lang="fr" cert="CLES" nivs="C2" nivi="10"/>
     <!--0 to 3 repetitions:-->
     <cv24:autre titre="string" comment="string"/>
   </cv24:divers>
