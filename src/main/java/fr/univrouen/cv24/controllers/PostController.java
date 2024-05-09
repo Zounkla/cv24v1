@@ -80,8 +80,14 @@ public class PostController {
         Bson firstNameFilter = Filters.eq("cv24:cv24.cv24:identite.cv24:prenom", cvFirstName);
         Bson genderFilter = Filters.eq("cv24:cv24.cv24:identite.cv24:genre", cvGender);
         Bson telFilter = Filters.eq("cv24:cv24.cv24:identite.cv24:tel", cvTel);
-        Document collectionCV = collection.find(Filters.and(nameFilter, firstNameFilter,
-                genderFilter, telFilter)).first();
+        Document collectionCV;
+        if (cvTel == null) {
+            collectionCV = collection.find(Filters.and(nameFilter, firstNameFilter,
+                    genderFilter)).first();
+        } else {
+            collectionCV = collection.find(Filters.and(nameFilter, firstNameFilter,
+                    genderFilter, telFilter)).first();
+        }
         return collectionCV != null;
     }
 
@@ -96,6 +102,9 @@ public class PostController {
         int length = info.length();
         String closingTag = new StringBuilder(info).insert(1, "/").toString();
         int endIndex = cv.indexOf(closingTag);
+        if (endIndex == -1) {
+            return null;
+        }
         return cv.substring(beginIndex + length, endIndex);
     }
 
