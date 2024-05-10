@@ -12,7 +12,7 @@ import static com.mongodb.client.model.Filters.eq;
 @RestController
 public class DeleteController {
 
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/cv24/delete/{id}")
     public String delete(@PathVariable Integer id) {
         MongoClient mongo;
         mongo = MongoClients.create("mongodb://user:resu@localhost:27017");

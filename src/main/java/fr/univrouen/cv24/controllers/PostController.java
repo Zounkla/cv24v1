@@ -5,7 +5,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.result.InsertOneResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.json.JSONObject;
@@ -36,7 +35,7 @@ public class PostController {
             + flux + "</result>");
     }
 
-    @RequestMapping(value="/insert", method = RequestMethod.POST, consumes = "application/xml")
+    @RequestMapping(value="/cv24/insert", method = RequestMethod.POST, consumes = "application/xml")
     public String insert(@RequestBody String cv) {
         if (!isValidXML(cv)) {
             return errorInsert("INVALID");
