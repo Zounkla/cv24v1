@@ -32,21 +32,21 @@ public class GetController {
         MongoCollection<Document> collection = database.getCollection("CV24");
         Document doc = collection.find(eq("id", id)).first();
         if (doc == null) {
-            return "not found";
+            return printErrorNotFound(id);
         }
         return documentToXML(collection, id);
     }
 
+
     private String documentToXML(MongoCollection<Document> collection, int id) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + "\n" + "<xmp>" + "\n");
-        stringBuilder.append("<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">" + "\n");
-        stringBuilder.append(printIdentity(collection, id));
-        stringBuilder.append(printObjective(collection, id));
-        stringBuilder.append(printProf(collection, id));
-        stringBuilder.append(printCompetences(collection, id));
-        stringBuilder.append("</cv24:cv24>" + "\n" + "</xmp>");
-        return stringBuilder.toString();
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + "\n" + "<xmp>" +
+                "<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">" + "\n" +
+                printIdentity(collection, id) +
+                printObjective(collection, id) +
+                printProf(collection, id) +
+                printCompetences(collection, id) +
+                printDivers(collection, id) +
+                "</cv24:cv24>" + "\n" + "</xmp>";
     }
 
     private String printIdentity(MongoCollection<Document> collection, int id) {
@@ -123,8 +123,7 @@ public class GetController {
         }
         return """
                     <cv24:prof>
-                        %s
-                    </cv24:prof>
+                     %s    </cv24:prof>
                 """.formatted(printDetails(collection, id));
     }
 
@@ -164,18 +163,18 @@ public class GetController {
             endDate = getInfoFromDB(details, "cv24:datefin=", "}");
         }
         String result = """
-               <cv24:detail>
-                    <cv24:datedeb>%s</cv24:datedeb>
+              \t <cv24:detail>
+                    \t\t<cv24:datedeb>%s</cv24:datedeb>
                 """.formatted(beginDate);
         if (!endDate.isEmpty()) {
             result +=
                     """
-                        <cv24:datefin>%s</cv24:datefin>
+                        \t\t<cv24:datefin>%s</cv24:datefin>
                     """.formatted(endDate);
         }
         result += """
-                    <cv24:titre>%s</cv24:titre>
-               </cv24:detail>
+                    \t\t<cv24:titre>%s</cv24:titre>
+               \t </cv24:detail>
                 """.formatted(title);
         return result;
     }
@@ -184,9 +183,7 @@ public class GetController {
         return
                 """
                     <cv24:competences>
-                        %s
-                        %s
-                    </cv24:competences>
+                     %s%s    </cv24:competences>
                 """.formatted(printDiplomas(collection, id), printCertifs(collection, id));
     }
 
@@ -227,18 +224,18 @@ public class GetController {
         }
         String level = getInfoFromDB(diplomas, "niveau=", "}");
         String result = """
-               <cv24:diplome="%s">
-                    <cv24:date>%s</cv24:date>
+               \t<cv24:diplome niveau="%s">
+                    \t\t<cv24:date>%s</cv24:date>
                 """.formatted(level, date);
         if (!institute.isEmpty()) {
             result +=
                     """
-                        <cv24:institut>%s</cv24:institut>
+                        \t\t<cv24:institut>%s</cv24:institut>
                     """.formatted(institute);
         }
         result += """
-                    <cv24:titre>%s</cv24:titre>
-               </cv24:diplome>
+                    \t\t<cv24:titre>%s</cv24:titre>
+               \t</cv24:diplome>
                 """.formatted(title);
         return result;
     }
@@ -278,19 +275,128 @@ public class GetController {
             dateEnd = getInfoFromDB(certifs, "cv24:datefin=", ",");
         }
         String result = """
-               <cv24:certif>
-                    <cv24:datedeb>%s</cv24:datedeb>
+               \t<cv24:certif>
+                    \t\t<cv24:datedeb>%s</cv24:datedeb>
                 """.formatted(dateBegin);
         if (!dateEnd.isEmpty()) {
             result +=
                     """
-                        <cv24:datefin>%s</cv24:datefin>
+                        \t\t<cv24:datefin>%s</cv24:datefin>
                     """.formatted(dateEnd);
         }
         result += """
-                    <cv24:titre>%s</cv24:titre>
-               </cv24:certif>
+                    \t\t<cv24:titre>%s</cv24:titre>
+               \t</cv24:certif>
                 """.formatted(title);
+        return result;
+    }
+
+    private String printDivers(MongoCollection<Document> collection, int id) {
+        Bson filter = Filters.eq("id", id);
+        Bson projection = Projections.fields(Projections.include(
+                        "cv24:cv24.cv24:divers"),
+                Projections.excludeId());
+        String divers = collection.find(filter).projection(projection).first().toString();
+        if (!divers.contains("cv24:divers")) {
+            return "";
+        }
+        return """
+                    <cv24:divers>
+                        %s
+                        %s
+                    </cv24:divers>
+                """.formatted(printLVs(collection, id), printOthers(collection, id));
+    }
+
+    private String printLVs(MongoCollection<Document> collection, int id) {
+        Bson filter = Filters.eq("id", id);
+        Bson projection = Projections.fields(Projections.include(
+                        "cv24:cv24.cv24:divers.cv24:lv"),
+                Projections.excludeId());
+        String lvs = collection.find(filter).projection(projection).first().toString();
+        if (lvs.contains("[")) {
+            lvs = lvs.substring(lvs.indexOf("lv=[") + "lv=[".length(),
+                    lvs.indexOf("]"));
+        } else {
+            lvs = lvs.substring(lvs.indexOf("lv=")
+                            + "lv=".length(),
+                    lvs.indexOf("}}}}"));
+        }
+        StringBuilder result = new StringBuilder();
+        while (lvs.contains("Document{{")) {
+            lvs = lvs.substring(lvs.indexOf("Document{{")
+                    + "Document{{".length());
+            result.append(printLV(lvs));
+        }
+        return result.toString();
+    }
+
+    private String printLV(String lvs) {
+        String cert = getInfoFromDB(lvs, "cert=", ",");
+        lvs = lvs.substring(lvs.indexOf(",") + 1);
+        String nivs = getInfoFromDB(lvs, "nivs=", ",");
+        lvs = lvs.substring(lvs.indexOf(",") + 1);
+        String lang;
+        if (!lvs.startsWith(" lang=")) {
+            lang = "";
+        } else {
+            lang = getInfoFromDB(lvs, "lang=", ",");
+            lvs = lvs.substring(lvs.indexOf(",") + 1);
+        }
+        String nivi;
+        if (!lvs.startsWith(" nivi=")) {
+            nivi = "";
+        } else {
+            nivi = getInfoFromDB(lvs, "nivi=", ",");
+        }
+        String result = "<cv24:lv lang=\"" + lang + "\" " + "cert=\"" + cert + "\" ";
+        if (!nivs.isEmpty()) {
+            result += "nivs=\"" + nivs + "\" ";
+        }
+        if (!nivi.isEmpty()) {
+            result += "nivi=\"" + nivi + "\"";
+        }
+        result += "/>";
+        return result;
+    }
+
+    private String printOthers(MongoCollection<Document> collection, int id) {
+        Bson filter = Filters.eq("id", id);
+        Bson projection = Projections.fields(Projections.include(
+                        "cv24:cv24.cv24:divers.cv24:autre"),
+                Projections.excludeId());
+        String others = collection.find(filter).projection(projection).first().toString();
+        if (others.contains("[")) {
+            others = others.substring(others.indexOf("autre=[") + "autre=[".length(),
+                    others.indexOf("]"));
+        } else {
+            others = others.substring(others.indexOf("autre=")
+                            + "autre=".length(),
+                    others.indexOf("}}}}"));
+        }
+        StringBuilder result = new StringBuilder();
+        while (others.contains("Document{{")) {
+            others = others.substring(others.indexOf("Document{{")
+                    + "Document{{".length());
+            result.append(printOther(others));
+        }
+        return result.toString();
+    }
+
+    private String printOther(String others) {
+        String title = getInfoFromDB(others, "titre=", ",");
+        others = others.substring(others.indexOf(",") + 1);
+        String comment;
+        if (!others.startsWith(" comment=")) {
+            comment = "";
+        } else {
+            comment = getInfoFromDB(others, "comment=", ",");
+        }
+        String result = "<cv24:autre titre=\"" + title + "\" ";
+        if (!comment.isEmpty()) {
+            result += "comment=\"" + comment + "\"";
+        }
+        result += "/>";
         return result;
     }
 
@@ -309,4 +415,14 @@ public class GetController {
         return getInfoFromDB(field, result, "}");
     }
 
+    private String printErrorNotFound(int id) {
+        return
+                "<xmp>" +
+                """
+                <error>
+                    <id>%s</id>
+                    <status>ERROR</status>
+                </error>
+                """.formatted(id) + "</xmp>";
+    }
 }
