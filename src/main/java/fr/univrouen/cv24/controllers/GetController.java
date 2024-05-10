@@ -12,6 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import java.io.StringReader;
+import java.io.StringWriter;
+
 import static com.mongodb.client.model.Filters.eq;
 
 @RestController
@@ -32,9 +39,40 @@ public class GetController {
         MongoCollection<Document> collection = database.getCollection("CV24");
         Document doc = collection.find(eq("id", id)).first();
         if (doc == null) {
-            return printErrorNotFound(id);
+            return printErrorNotFoundXML(id);
         }
         return documentToXML(collection, id);
+    }
+
+    @GetMapping("/cv24/html")
+    public String getCVByIdHTML(
+            @RequestParam(value = "id") int id
+    ) {
+        MongoClient mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
+        //Connecting to the database
+        MongoDatabase database = mongo.getDatabase("main");
+        MongoCollection<Document> collection = database.getCollection("CV24");
+        Document doc = collection.find(eq("id", id)).first();
+        if (doc == null) {
+            return printErrorNotFoundHTML(id);
+        }
+        String XMLFile = documentToXML(collection, id);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Source xslt = new StreamSource("src/main/resources/xml/cv24.tp4.xslt");
+        Source xml = new StreamSource(new StringReader(XMLFile));
+        Transformer transformer;
+        try {
+            transformer = transformerFactory.newTransformer(xslt);
+        } catch (TransformerConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        StringWriter writer = new StringWriter();
+        try {
+            transformer.transform(xml, new StreamResult(writer));
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
+        return writer.toString();
     }
 
 
@@ -415,7 +453,7 @@ public class GetController {
         return getInfoFromDB(field, result, "}");
     }
 
-    private String printErrorNotFound(int id) {
+    private String printErrorNotFoundXML(int id) {
         return
                 "<xmp>" +
                 """
@@ -424,5 +462,18 @@ public class GetController {
                     <status>ERROR</status>
                 </error>
                 """.formatted(id) + "</xmp>";
+    }
+
+    private String printErrorNotFoundHTML(int id) {
+        return
+                "<p>" +
+                        """
+                
+                            %s
+                            </p>
+                            <p>
+                            ERROR
+                        </p>
+                        """.formatted(id);
     }
 }

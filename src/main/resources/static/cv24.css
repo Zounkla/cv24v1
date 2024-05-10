@@ -1,0 +1,16 @@
+h1 {
+    text-align: center;
+}
+
+h1, h2 {
+    color: blue;
+    font-weight: bold;
+}
+
+ol > li:nth-child(2n) {
+    background-color: gray;
+}
+
+ol > li:nth-child(2n + 1) {
+    background-color: white;
+}

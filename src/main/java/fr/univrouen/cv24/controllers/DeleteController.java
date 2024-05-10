@@ -12,8 +12,8 @@ import static com.mongodb.client.model.Filters.eq;
 @RestController
 public class DeleteController {
 
-    @DeleteMapping(value = "/cv24/delete/{id}")
-    public String delete(@PathVariable Integer id) {
+    @DeleteMapping(value = "/cv24/delete")
+    public String delete(@RequestParam(value = "id") Integer id) {
         MongoClient mongo;
         mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
         MongoDatabase database = mongo.getDatabase("main");
