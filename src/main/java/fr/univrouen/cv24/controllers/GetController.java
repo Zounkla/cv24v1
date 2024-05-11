@@ -4,7 +4,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -15,19 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.mongodb.client.model.Filters.eq;
 
 @RestController
 public class GetController {
-
-    @GetMapping("/resume")
-    public String getListCVinXML() {
-        return "Envoi de la liste des CV";
-    }
 
     @GetMapping("/cv24/xml")
     public String getCVById(
@@ -58,7 +55,7 @@ public class GetController {
         }
         String XMLFile = documentToXML(collection, id);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Source xslt = new StreamSource("src/main/resources/xml/cv24.tp4.xslt");
+        Source xslt = new StreamSource("src/main/resources/xml/CV.xslt");
         Source xml = new StreamSource(new StringReader(XMLFile));
         Transformer transformer;
         try {
@@ -75,20 +72,64 @@ public class GetController {
         return writer.toString();
     }
 
+    @GetMapping("/cv24/resume/xml")
+    public String resumeXML() {
+        MongoClient mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
+        //Connecting to the database
+        MongoDatabase database = mongo.getDatabase("main");
+        MongoCollection<Document> collection = database.getCollection("CV24");
+        StringBuilder result = new StringBuilder("""
+                <?xml version="1.0" encoding="UTF-8" ?>
+                <xmp>
+                <cvs>
+                """);
+        for (Document doc: collection.find()) {
+            int id = (int) doc.get("id");
+            result.append("    <cv>\n");
+            result.append("    <id>").append(id).append("</id>\n");
+            result.append(printIdentity(collection, id, false));
+            result.append(printObjective(collection, id, false));
+            result.append(printHighestDiploma(collection, id));
+            result.append("    </cv>\n");
+        }
+        result.append("</cvs></xmp>");
+        return result.toString();
+    }
+
+    @GetMapping("/cv24/resume")
+    public String resumeHTML() {
+        String XML = resumeXML();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Source xslt = new StreamSource("src/main/resources/xml/CVResume.xslt");
+        Source xml = new StreamSource(new StringReader(XML));
+        Transformer transformer;
+        try {
+            transformer = transformerFactory.newTransformer(xslt);
+        } catch (TransformerConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        StringWriter writer = new StringWriter();
+        try {
+            transformer.transform(xml, new StreamResult(writer));
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
+        return writer.toString();
+    }
 
     private String documentToXML(MongoCollection<Document> collection, int id) {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + "\n" + "<xmp>" +
                 "<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">" + "\n" +
-                printIdentity(collection, id) +
-                printObjective(collection, id) +
+                printIdentity(collection, id, true) +
+                printObjective(collection, id, true) +
                 printProf(collection, id) +
                 printCompetences(collection, id) +
                 printDivers(collection, id) +
                 "</cv24:cv24>" + "\n" + "</xmp>";
     }
 
-    private String printIdentity(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+    private String printIdentity(MongoCollection<Document> collection, int id, boolean full) {
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                 "cv24:cv24.cv24:identite.cv24:nom"),
                 Projections.excludeId());
@@ -109,15 +150,40 @@ public class GetController {
                         "cv24:cv24.cv24:identite.cv24:mel"),
                 Projections.excludeId());
         Document mel = collection.find(filter).projection(projection).first();
-        String identityBeginning =
-                """
-                    <cv24:identite>
-                        <cv24:genre>%s</cv24:genre>
-                        <cv24:nom>%s</cv24:nom>
-                        <cv24:prenom>%s</cv24:prenom>
-                """.formatted(getInfoFromDB(gender, "cv24:genre="),
-                        getInfoFromDB(name, "cv24:nom="),
-                        getInfoFromDB(firstName, "cv24:prenom="));
+        String identityEnding;
+        String identityBeginning;
+        if (!full) {
+            identityBeginning =
+                    """
+                        <identite>
+                            <genre>%s</genre>
+                            <nom>%s</nom>
+                            <prenom>%s</prenom>
+                    """.formatted(getInfoFromDB(gender, "cv24:genre="),
+                            getInfoFromDB(name, "cv24:nom="),
+                            getInfoFromDB(firstName, "cv24:prenom="));
+            identityEnding =
+                    """
+                        </identite>
+                    """;
+        } else {
+            identityBeginning =
+                    """
+                        <cv24:identite>
+                            <cv24:genre>%s</cv24:genre>
+                            <cv24:nom>%s</cv24:nom>
+                            <cv24:prenom>%s</cv24:prenom>
+                    """.formatted(getInfoFromDB(gender, "cv24:genre="),
+                            getInfoFromDB(name, "cv24:nom="),
+                            getInfoFromDB(firstName, "cv24:prenom="));
+            identityEnding =
+                    """
+                        </cv24:identite>
+                    """;
+        }
+        if (!full) {
+            return identityBeginning + identityEnding;
+        }
         if (tel.toString().contains("cv24:tel=")) {
             identityBeginning +=
                     """
@@ -130,19 +196,22 @@ public class GetController {
                             <cv24:mel>%s</cv24:mel>
                     """.formatted(getInfoFromDB(mel.toString(), "cv24:mel="));
         }
-        String identityEnding =
-        """
-            </cv24:identite>
-        """;
         return identityBeginning + identityEnding;
     }
 
-    private String printObjective(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+    private String printObjective(MongoCollection<Document> collection, int id, boolean full) {
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:objectif"),
                 Projections.excludeId());
         String objective = collection.find(filter).projection(projection).first().toString();
+        if (!full) {
+            return """
+                    <objectif statut="%s">%s</objectif>
+                """.formatted(
+                    getInfoFromDB(objective, "statut=", ","),
+                    getInfoFromDB(objective, "content="));
+        }
         return """
                     <cv24:objectif statut="%s">%s</cv24:objectif>
                 """.formatted(
@@ -151,7 +220,7 @@ public class GetController {
     }
 
     private String printProf(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:prof"),
                 Projections.excludeId());
@@ -166,7 +235,7 @@ public class GetController {
     }
 
     private String printDetails(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:prof.cv24:detail"),
                 Projections.excludeId());
@@ -226,7 +295,7 @@ public class GetController {
     }
 
     private String printDiplomas(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:competences.cv24:diplome"),
                 Projections.excludeId());
@@ -243,12 +312,12 @@ public class GetController {
         while (diplomas.contains("Document{{")) {
             diplomas = diplomas.substring(diplomas.indexOf("Document{{")
                     + "Document{{".length());
-            result.append(printDiploma(diplomas));
+            result.append(printDiploma(diplomas, true));
         }
         return result.toString();
     }
 
-    private String printDiploma(String diplomas) {
+    private String printDiploma(String diplomas, boolean full) {
         String title = getInfoFromDB(diplomas, "cv24:titre=", ",");
         diplomas = diplomas.substring(diplomas.indexOf(",") + 1);
         String date = getInfoFromDB(diplomas, "cv24:date=", ",");
@@ -261,25 +330,88 @@ public class GetController {
             diplomas = diplomas.substring(diplomas.indexOf(",") + 2);
         }
         String level = getInfoFromDB(diplomas, "niveau=", "}");
-        String result = """
+        String result;
+        if (!full) {
+            result = """
+               \t<diplome niveau="%s">
+                    \t\t<date>%s</date>
+                """.formatted(level, date);
+        } else {
+            result = """
                \t<cv24:diplome niveau="%s">
                     \t\t<cv24:date>%s</cv24:date>
                 """.formatted(level, date);
-        if (!institute.isEmpty()) {
-            result +=
-                    """
-                        \t\t<cv24:institut>%s</cv24:institut>
-                    """.formatted(institute);
         }
-        result += """
+
+        if (!institute.isEmpty()) {
+            if (full) {
+                result +=
+                        """
+                            \t\t<cv24:institut>%s</cv24:institut>
+                        """.formatted(institute);
+            } else {
+                result +=
+                        """
+                            \t\t<institut>%s</institut>
+                        """.formatted(institute);
+            }
+
+        }
+        if (full) {
+            result += """
                     \t\t<cv24:titre>%s</cv24:titre>
                \t</cv24:diplome>
                 """.formatted(title);
+        } else {
+            result += """
+                    \t\t<titre>%s</titre>
+               \t</diplome>
+                """.formatted(title);
+        }
+
+        return result;
+    }
+
+    private String printHighestDiploma(MongoCollection<Document> collection, int id) {
+        Bson filter = eq("id", id);
+        Bson projection = Projections.fields(Projections.include(
+                        "cv24:cv24.cv24:competences.cv24:diplome"),
+                Projections.excludeId());
+        String diplomas = collection.find(filter).projection(projection).first().toString();
+        if (diplomas.contains("[")) {
+            diplomas = diplomas.substring(diplomas.indexOf("diplome=[") + "diplome=[".length(),
+                    diplomas.indexOf("]"));
+        } else {
+            diplomas = diplomas.substring(diplomas.indexOf("diplome=")
+                            + "diplome=".length(),
+                    diplomas.indexOf("}}}}"));
+        }
+        String result = "";
+        Date maxDate = null;
+        while (diplomas.contains("Document{{")) {
+            diplomas = diplomas.substring(diplomas.indexOf("Document{{")
+                    + "Document{{".length());
+            String tmp = printDiploma(diplomas, false);
+            int beginIndex = tmp.indexOf("<date>") + "<date>".length();
+            String dateFormat = "yyyy-MM-dd";
+            String dateString = tmp.substring(beginIndex, beginIndex + dateFormat.length());
+            SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
+            Date date;
+            try {
+                date = formatter.parse(dateString);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            if (maxDate == null || date.getTime() > maxDate.getTime()) {
+                maxDate = date;
+                result = printDiploma(diplomas, false);
+            }
+        }
         return result;
     }
 
     private String printCertifs(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:competences.cv24:certif"),
                 Projections.excludeId());
@@ -330,7 +462,7 @@ public class GetController {
     }
 
     private String printDivers(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:divers"),
                 Projections.excludeId());
@@ -347,7 +479,7 @@ public class GetController {
     }
 
     private String printLVs(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:divers.cv24:lv"),
                 Projections.excludeId());
@@ -399,7 +531,7 @@ public class GetController {
     }
 
     private String printOthers(MongoCollection<Document> collection, int id) {
-        Bson filter = Filters.eq("id", id);
+        Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
                         "cv24:cv24.cv24:divers.cv24:autre"),
                 Projections.excludeId());
