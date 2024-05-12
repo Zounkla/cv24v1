@@ -29,12 +29,6 @@ import static com.mongodb.client.model.Filters.eq;
 @RestController
 public class PostController {
 
-    @RequestMapping(value = "/testpost", method = RequestMethod.POST, consumes = "application/xml")
-    public String postTest(@RequestBody String flux) {
-        return ("<result><response>Message reçu : </response>"
-            + flux + "</result>");
-    }
-
     @RequestMapping(value="/cv24/insert", method = RequestMethod.POST, consumes = "application/xml")
     public String insert(@RequestBody String cv) {
         if (!isValidXML(cv)) {
@@ -147,7 +141,7 @@ public class PostController {
         SchemaFactory sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         try {
             spf.setSchema(sf.newSchema(
-                    new Source[] {new StreamSource("src/main/resources/xml/cv24.tp1.xsd")}
+                    new Source[] {new StreamSource("src/main/resources/xml/CV.xsd")}
             ));
         } catch (SAXException e) {
             throw new RuntimeException(e);
@@ -191,17 +185,17 @@ public class PostController {
         }
 
         @Override
-        public void warning(SAXParseException exception) throws SAXException {
+        public void warning(SAXParseException exception) {
             errorOccured = true;
         }
 
         @Override
-        public void error(SAXParseException exception) throws SAXException {
+        public void error(SAXParseException exception) {
             errorOccured = true;
         }
 
         @Override
-        public void fatalError(SAXParseException exception) throws SAXException {
+        public void fatalError(SAXParseException exception) {
             errorOccured = true;
         }
     }

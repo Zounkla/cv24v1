@@ -117,6 +117,12 @@ public class GetController {
         return writer.toString();
     }
 
+    /**
+     * documentToXML: prints a CV in database to an XML format
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String documentToXML(MongoCollection<Document> collection, int id) {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + "\n" + "<xmp>" +
                 "<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">" + "\n" +
@@ -128,6 +134,13 @@ public class GetController {
                 "</cv24:cv24>" + "\n" + "</xmp>";
     }
 
+    /**
+     * printIdentity : prints all information about the identity of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @param full true if all information is displayed, false if only firstname, gender, name
+     * @return String
+     */
     private String printIdentity(MongoCollection<Document> collection, int id, boolean full) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -199,6 +212,13 @@ public class GetController {
         return identityBeginning + identityEnding;
     }
 
+    /**
+     * printObjective : prints all information about the objective of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @param full true if it's for all details of a CV, false if it's for resume
+     * @return String
+     */
     private String printObjective(MongoCollection<Document> collection, int id, boolean full) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -219,6 +239,12 @@ public class GetController {
                                getInfoFromDB(objective, "content="));
     }
 
+    /**
+     * printProf : prints all information about the jobs of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printProf(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -234,6 +260,12 @@ public class GetController {
                 """.formatted(printDetails(collection, id));
     }
 
+    /**
+     * printDetails : prints all information about the details of the jobs of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printDetails(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -257,6 +289,11 @@ public class GetController {
         return result.toString();
     }
 
+    /**
+     * printIdentity : prints all information about the detail of a job in a CV
+     * @param details the details about the jobs
+     * @return String
+     */
     private String printDetail(String details) {
         String title = getInfoFromDB(details, "cv24:titre=", ",");
         details = details.substring(details.indexOf(",") + 1);
@@ -286,6 +323,12 @@ public class GetController {
         return result;
     }
 
+    /**
+     * printCompetences : prints all information about the competences of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printCompetences(MongoCollection<Document> collection, int id) {
         return
                 """
@@ -294,6 +337,12 @@ public class GetController {
                 """.formatted(printDiplomas(collection, id), printCertifs(collection, id));
     }
 
+    /**
+     * printDiplomas : prints all information about the diplomas of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printDiplomas(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -317,6 +366,12 @@ public class GetController {
         return result.toString();
     }
 
+    /**
+     * printIdentity : prints all information about a diploma in a CV
+     * @param diplomas all the diplomas in the CV
+     * @param full true if all diplomas are displayed, false if the last
+     * @return String
+     */
     private String printDiploma(String diplomas, boolean full) {
         String title = getInfoFromDB(diplomas, "cv24:titre=", ",");
         diplomas = diplomas.substring(diplomas.indexOf(",") + 1);
@@ -372,6 +427,12 @@ public class GetController {
         return result;
     }
 
+    /**
+     * printHighestDiploma : prints all information about the latest diploma of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printHighestDiploma(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -410,6 +471,12 @@ public class GetController {
         return result;
     }
 
+    /**
+     * printCertifs : prints all information about the certifications of a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printCertifs(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -433,6 +500,11 @@ public class GetController {
         return result.toString();
     }
 
+    /**
+     * printCertif : prints all information about a certification in a CV
+     * @param certifs the certifications of the CV
+     * @return String
+     */
     private String printCertif(String certifs) {
         String title = getInfoFromDB(certifs, "cv24:titre=", ",");
         certifs = certifs.substring(certifs.indexOf(",") + 1);
@@ -461,6 +533,12 @@ public class GetController {
         return result;
     }
 
+    /**
+     * printDivers : prints all miscellaneous information about a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printDivers(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -478,6 +556,12 @@ public class GetController {
                 """.formatted(printLVs(collection, id), printOthers(collection, id));
     }
 
+    /**
+     * printLVs : prints all languages information about a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printLVs(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -501,6 +585,11 @@ public class GetController {
         return result.toString();
     }
 
+    /**
+     * printLV : prints all information about a language in a CV
+     * @param lvs all languages in the CV
+     * @return String
+     */
     private String printLV(String lvs) {
         String cert = getInfoFromDB(lvs, "cert=", ",");
         lvs = lvs.substring(lvs.indexOf(",") + 1);
@@ -530,6 +619,12 @@ public class GetController {
         return result;
     }
 
+    /**
+     * printOthers : prints all extra information about a CV
+     * @param collection the CVs in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printOthers(MongoCollection<Document> collection, int id) {
         Bson filter = eq("id", id);
         Bson projection = Projections.fields(Projections.include(
@@ -553,6 +648,11 @@ public class GetController {
         return result.toString();
     }
 
+    /**
+     * printOther : prints details about extra information about a CV
+     * @param others the extra information of the CV
+     * @return String
+     */
     private String printOther(String others) {
         String title = getInfoFromDB(others, "titre=", ",");
         others = others.substring(others.indexOf(",") + 1);
@@ -570,6 +670,13 @@ public class GetController {
         return result;
     }
 
+    /**
+     * getInfoFromDB: returns the information from a CV in Database
+     * @param field the field coming from the Database
+     * @param result the attribute searched
+     * @param separator the separator
+     * @return String
+     */
     private String getInfoFromDB(String field, String result, String separator) {
         int beginIndex = field.indexOf(result) + result.length();
         int endIndex;
@@ -581,10 +688,21 @@ public class GetController {
         return field.substring(beginIndex, endIndex);
     }
 
+    /**
+     * getInfoFromDB: returns the information from a CV in Database
+     * @param field the field coming from the Database
+     * @param result the attribute searched
+     * @return String
+     */
     private String getInfoFromDB(String field, String result) {
         return getInfoFromDB(field, result, "}");
     }
 
+    /**
+     * printErrorNotFoundXML: prints a message error, XML formatted, about a CV not found in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printErrorNotFoundXML(int id) {
         return
                 "<xmp>" +
@@ -596,6 +714,11 @@ public class GetController {
                 """.formatted(id) + "</xmp>";
     }
 
+    /**
+     * printErrorNotFoundHTML: prints a message error, HTML formatted, about a CV not found in DB
+     * @param id the id of the CV
+     * @return String
+     */
     private String printErrorNotFoundHTML(int id) {
         return
                 "<p>" +
