@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.xml.sax.*;
 
@@ -29,7 +30,17 @@ import static com.mongodb.client.model.Filters.eq;
 @Service
 public class CVService {
 
-    public static String MONGO_URL = "mongodb://user:resu@localhost:27017";
+    @Value("${spring.data.mongodb.uri}")
+    private String mongoURI;
+
+
+    /**
+     * getMongoURI: returns the connection string for database
+     * @return String
+     */
+    public String getMongoURI() {
+        return mongoURI;
+    }
 
     /**
      * transformXMLToHTML: transforms an XML document to an HTML one, thanks to XSLT

@@ -28,17 +28,17 @@ public class PostController {
         JSONObject xmlJsonObject = XML.toJSONObject(cv);
         String jsonString = xmlJsonObject.toString();
         Document doc = Document.parse(jsonString);
-        MongoClient mongo;
-        mongo = MongoClients.create(CVService.MONGO_URL);
-        //Connecting to the database
-        MongoDatabase database = mongo.getDatabase("main");
-        MongoCollection<Document> collection = database.getCollection("CV24");
-        if (service.identityAlreadyInDB(cv, collection)) {
-            return service.errorInsert("DUPLICATED");
+        try (MongoClient mongo = MongoClients.create(service.getMongoURI())) {
+            //Connecting to the database
+            MongoDatabase database = mongo.getDatabase("main");
+            MongoCollection<Document> collection = database.getCollection("CV24");
+            if (service.identityAlreadyInDB(cv, collection)) {
+                return service.errorInsert("DUPLICATED");
+            }
+            int id = service.getNextId(collection);
+            doc.append("id", id);
+            collection.insertOne(doc);
+            return service.successInsert(id);
         }
-        int id = service.getNextId(collection);
-        doc.append("id", id);
-        collection.insertOne(doc);
-        return service.successInsert(id);
     }
 }

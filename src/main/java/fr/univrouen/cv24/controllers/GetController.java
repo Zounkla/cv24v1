@@ -22,47 +22,50 @@ public class GetController {
 
     @Autowired
     public CVService service;
-    
+
     @GetMapping("/cv24/xml")
     public String getCVById(
             @RequestParam(value = "id") int id
     ) {
-        MongoClient mongo = MongoClients.create(CVService.MONGO_URL);
-        //Connecting to the database
-        MongoDatabase database = mongo.getDatabase("main");
-        MongoCollection<Document> collection = database.getCollection("CV24");
-        Document doc = collection.find(eq("id", id)).first();
-        if (doc == null) {
-            return service.printErrorNotFoundXML(id);
+        try (MongoClient mongo = MongoClients.create(service.getMongoURI())) {
+            //Connecting to the database
+            MongoDatabase database = mongo.getDatabase("main");
+            MongoCollection<Document> collection = database.getCollection("CV24");
+            Document doc = collection.find(eq("id", id)).first();
+            if (doc == null) {
+                return service.printErrorNotFoundXML(id);
+            }
+            return service.documentToXML(collection, id);
         }
-        return service.documentToXML(collection, id);
     }
 
     @GetMapping("/cv24/html")
     public String getCVByIdHTML(
             @RequestParam(value = "id") int id
     ) {
-        MongoClient mongo = MongoClients.create(CVService.MONGO_URL);
-        //Connecting to the database
-        MongoDatabase database = mongo.getDatabase("main");
-        MongoCollection<Document> collection = database.getCollection("CV24");
-        Document doc = collection.find(eq("id", id)).first();
-        if (doc == null) {
-            return service.printErrorNotFoundHTML(id);
+        try (MongoClient mongo = MongoClients.create(service.getMongoURI())) {
+            //Connecting to the database
+            MongoDatabase database = mongo.getDatabase("main");
+            MongoCollection<Document> collection = database.getCollection("CV24");
+            Document doc = collection.find(eq("id", id)).first();
+            if (doc == null) {
+                return service.printErrorNotFoundHTML(id);
+            }
+            String XMLFile = service.documentToXML(collection, id);
+            Source xslt = new StreamSource("src/main/resources/xml/CV.xslt");
+            Source xml = new StreamSource(new StringReader(XMLFile));
+            return service.transformXMLToHTML(xml, xslt);
         }
-        String XMLFile = service.documentToXML(collection, id);
-        Source xslt = new StreamSource("src/main/resources/xml/CV.xslt");
-        Source xml = new StreamSource(new StringReader(XMLFile));
-        return service.transformXMLToHTML(xml, xslt);
     }
 
     @GetMapping("/cv24/resume/xml")
     public String resumeXML() {
-        MongoClient mongo = MongoClients.create(CVService.MONGO_URL);
-        //Connecting to the database
-        MongoDatabase database = mongo.getDatabase("main");
-        MongoCollection<Document> collection = database.getCollection("CV24");
-        return service.resumeXML(collection);
+        try (MongoClient mongo = MongoClients.create(service.getMongoURI())) {
+            //Connecting to the database
+            MongoDatabase database = mongo.getDatabase("main");
+            MongoCollection<Document> collection = database.getCollection("CV24");
+            return service.resumeXML(collection);
+        }
     }
 
     @GetMapping("/cv24/resume")

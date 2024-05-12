@@ -19,15 +19,16 @@ public class DeleteController {
 
     @DeleteMapping(value = "/cv24/delete")
     public String delete(@RequestParam(value = "id") Integer id) {
-        MongoClient mongo;
-        mongo = MongoClients.create(CVService.MONGO_URL);
-        MongoDatabase database = mongo.getDatabase("main");
-        MongoCollection<Document> collection = database.getCollection("CV24");
-        Document cv = collection.find(eq("id", id)).first();
-        if(cv == null) {
-            return service.errorDelete("NOT IN DATABASE");
+        try (MongoClient mongo = MongoClients.create(service.getMongoURI())) {
+            //Connecting to the database
+            MongoDatabase database = mongo.getDatabase("main");
+            MongoCollection<Document> collection = database.getCollection("CV24");
+            Document cv = collection.find(eq("id", id)).first();
+            if (cv == null) {
+                return service.errorDelete("NOT IN DATABASE");
+            }
+            collection.deleteOne(cv);
+            return service.successDelete(id);
         }
-        collection.deleteOne(cv);
-        return service.successDelete(id);
     }
 }
