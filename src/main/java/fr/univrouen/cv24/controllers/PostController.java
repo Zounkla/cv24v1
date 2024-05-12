@@ -29,7 +29,7 @@ public class PostController {
         String jsonString = xmlJsonObject.toString();
         Document doc = Document.parse(jsonString);
         MongoClient mongo;
-        mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
+        mongo = MongoClients.create(CVService.MONGO_URL);
         //Connecting to the database
         MongoDatabase database = mongo.getDatabase("main");
         MongoCollection<Document> collection = database.getCollection("CV24");

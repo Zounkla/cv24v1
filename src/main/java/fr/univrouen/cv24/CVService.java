@@ -29,6 +29,8 @@ import static com.mongodb.client.model.Filters.eq;
 @Service
 public class CVService {
 
+    public static String MONGO_URL = "mongodb://user:resu@localhost:27017";
+
     /**
      * transformXMLToHTML: transforms an XML document to an HTML one, thanks to XSLT
      * @param XML the XML to transform

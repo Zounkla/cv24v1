@@ -27,7 +27,7 @@ public class GetController {
     public String getCVById(
             @RequestParam(value = "id") int id
     ) {
-        MongoClient mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
+        MongoClient mongo = MongoClients.create(CVService.MONGO_URL);
         //Connecting to the database
         MongoDatabase database = mongo.getDatabase("main");
         MongoCollection<Document> collection = database.getCollection("CV24");
@@ -42,7 +42,7 @@ public class GetController {
     public String getCVByIdHTML(
             @RequestParam(value = "id") int id
     ) {
-        MongoClient mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
+        MongoClient mongo = MongoClients.create(CVService.MONGO_URL);
         //Connecting to the database
         MongoDatabase database = mongo.getDatabase("main");
         MongoCollection<Document> collection = database.getCollection("CV24");
@@ -58,7 +58,7 @@ public class GetController {
 
     @GetMapping("/cv24/resume/xml")
     public String resumeXML() {
-        MongoClient mongo = MongoClients.create("mongodb://user:resu@localhost:27017");
+        MongoClient mongo = MongoClients.create(CVService.MONGO_URL);
         //Connecting to the database
         MongoDatabase database = mongo.getDatabase("main");
         MongoCollection<Document> collection = database.getCollection("CV24");
