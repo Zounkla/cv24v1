@@ -1,20 +1,14 @@
 package fr.univrouen.cv24.model;
 
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 public class Langue {
-
     private String lang;
     private String cert;
     private String nivs;
     private Integer nivi;
-
-    public Langue(String lang, String cert, String nivs, Integer nivi) {
-        this.lang = lang;
-        this.cert = cert;
-        this.nivs = nivs;
-        this.nivi = nivi;
-    }
 
     public String getLang() {
         return lang;

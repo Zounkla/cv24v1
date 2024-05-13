@@ -1,18 +1,19 @@
 package fr.univrouen.cv24.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.Date;
 
 public class Certif {
 
+    @Field("cv24:datedeb")
     private Date datedeb;
-    private Date datefin;
-    private String titre;
 
-    public Certif(Date datedeb, Date datefin, String titre) {
-        this.datedeb = datedeb;
-        this.datefin = datefin;
-        this.titre = titre;
-    }
+    @Field("cv24:datefin")
+    private Date datefin;
+
+    @Field("cv24:titre")
+    private String titre;
 
     public Date getDatedeb() {
         return datedeb;

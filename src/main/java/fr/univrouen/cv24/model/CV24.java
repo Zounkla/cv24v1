@@ -10,46 +10,46 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class CV24 {
 
     @Id
+    @Field("_id")
     private String id;
 
+    @Field("id")
+    private int cvId;
+
     @DBRef(lazy = true)
-    @Field("cv24:identite")
+    @Field("cv24:cv24.cv24:identite")
     private Identite identite;
 
     @DBRef(lazy = true)
-    @Field("cv24:objectif")
+    @Field("cv24:cv24.cv24:objectif")
     private Objectif objectif;
 
     @DBRef(lazy = true)
-    @Field("cv24:prof")
+    @Field("cv24:cv24.cv24:prof")
     private Prof prof;
 
     @DBRef(lazy = true)
-    @Field("cv24:competences")
+    @Field("cv24:cv24.cv24:competences")
     private Competences competences;
 
     @DBRef(lazy = true)
-    @Field("cv24:divers")
+    @Field("cv24:cv24.cv24:divers")
     private Divers divers;
-
-    @PersistenceCreator
-    public CV24(String id,
-                Identite identite,
-                Objectif objectif,
-                Prof prof,
-                Competences competences,
-                Divers divers) {
-        this.id = id;
-        this.identite = identite;
-        this.objectif = objectif;
-        this.prof = prof;
-        this.competences = competences;
-        this.divers = divers;
-    }
 
     public String  getId() {
         return id;
     }
+
+    public void setId(String id) { this.id = id; }
+
+    public int getCvId() {
+        return cvId;
+    }
+
+    public void setCvId(int cvId) {
+        this.cvId = cvId;
+    }
+
 
     public Identite getIdentity() {
         return identite;

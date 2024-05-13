@@ -5,6 +5,10 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import fr.univrouen.cv24.CVService;
+import fr.univrouen.cv24.model.Autre;
+import fr.univrouen.cv24.model.CV24;
+import fr.univrouen.cv24.model.Langue;
+import fr.univrouen.cv24.repository.CV24Repository;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -21,7 +28,7 @@ import static com.mongodb.client.model.Filters.eq;
 public class GetController {
 
     @Autowired
-    public CVService service;
+    private CVService service;
 
     @GetMapping("/cv24/xml")
     public String getCVById(

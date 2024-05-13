@@ -785,7 +785,7 @@ public class CVService {
         if (!others.startsWith(" comment=")) {
             comment = "";
         } else {
-            comment = getInfoFromDB(others, "comment=", ",");
+            comment = getInfoFromDB(others, "comment=", "}");
         }
         String result = "<cv24:autre titre=\"" + title + "\" ";
         if (!comment.isEmpty()) {

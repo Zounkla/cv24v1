@@ -1,23 +1,20 @@
 package fr.univrouen.cv24.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.List;
 
 public class Competences {
 
-    private Diplome diplome;
+    private List<Diplome> diplome;
 
     private List<Certif> certifList;
 
-    public Competences(Diplome diplome, List<Certif> certifList) {
-        this.diplome = diplome;
-        this.certifList = certifList;
-    }
-
-    public Diplome getDiplome() {
+    public List<Diplome> getDiplome() {
         return diplome;
     }
 
-    public void setDiplome(Diplome diplome) {
+    public void setDiplome(List<Diplome> diplome) {
         this.diplome = diplome;
     }
 

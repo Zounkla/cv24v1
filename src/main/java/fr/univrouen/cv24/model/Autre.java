@@ -1,14 +1,14 @@
 package fr.univrouen.cv24.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 public class Autre {
 
+    @Field("titre")
     private String titre;
-    private String comment;
 
-    public Autre(String titre, String comment) {
-        this.titre = titre;
-        this.comment = comment;
-    }
+    @Field("comment")
+    private String comment;
 
     public String getTitre() {
         return titre;

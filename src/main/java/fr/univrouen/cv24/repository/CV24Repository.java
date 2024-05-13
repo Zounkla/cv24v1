@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CV24Repository extends MongoRepository<CV24, String> {
 
+    CV24 findByCvId(int id);
 }

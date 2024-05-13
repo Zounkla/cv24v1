@@ -1,33 +1,37 @@
 package fr.univrouen.cv24.model;
 
-import org.springframework.data.mongodb.core.mapping.Language;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import org.springframework.data.annotation.AccessType;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Divers {
 
-    private List<Langue> lv;
+    @Field("cv24:lv")
+    private Langue[] lv;
+    @Field("cv24:autre")
+    private Autre[] autre;
 
-    private List<Autre> autre;
-
-    public Divers(List<Langue> lv, List<Autre> autre) {
-        this.lv = lv;
-        this.autre = autre;
+    public Divers() {
+        lv = new Langue[]{};
+        autre = new Autre[]{};
     }
 
-    public List<Langue> getLv() {
+    public Langue[] getLv() {
         return lv;
     }
 
-    public void setLv(List<Langue> lv) {
+    public void setLv(Langue[] lv) {
         this.lv = lv;
     }
 
-    public List<Autre> getAutre() {
+    public Autre[] getAutre() {
         return autre;
     }
 
-    public void setAutre(List<Autre> autre) {
+    public void setAutre(Autre[] autre) {
         this.autre = autre;
     }
 }
