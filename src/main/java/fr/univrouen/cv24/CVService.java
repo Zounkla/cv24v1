@@ -69,7 +69,7 @@ public class CVService {
     public String resumeXML(MongoCollection<Document> collection) {
         StringBuilder result = new StringBuilder("""
                 <?xml version="1.0" encoding="UTF-8" ?>
-                <xmp><cvs>
+                <cvs>
                 """);
         for (Document doc: collection.find()) {
             int id = (int) doc.get("id");
@@ -80,7 +80,7 @@ public class CVService {
             result.append(printHighestDiploma(collection, id));
             result.append("    </cv>\n");
         }
-        return result.append("</cvs></xmp>").toString();
+        return result.append("</cvs>").toString();
     }
 
     /**
@@ -249,14 +249,14 @@ public class CVService {
      * @return String
      */
     public String documentToXML(MongoCollection<Document> collection, int id) {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + "\n" + "<xmp>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + "\n"  +
                 "<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">" + "\n" +
                 printIdentity(collection, id, true) +
                 printObjective(collection, id, true) +
                 printProf(collection, id) +
                 printCompetences(collection, id) +
                 printDivers(collection, id) +
-                "</cv24:cv24>" + "\n" + "</xmp>";
+                "</cv24:cv24>" + "\n";
     }
 
     /**
@@ -830,13 +830,12 @@ public class CVService {
      */
     public String printErrorNotFoundXML(int id) {
         return
-                "<xmp>" +
                         """
                         <error>
                             <id>%s</id>
                             <status>ERROR</status>
                         </error>
-                        """.formatted(id) + "</xmp>";
+                        """.formatted(id);
     }
 
     /**
