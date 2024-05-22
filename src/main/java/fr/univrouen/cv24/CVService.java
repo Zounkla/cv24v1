@@ -642,7 +642,7 @@ public class CVService {
         if (!certifs.startsWith(" cv24:datefin=")) {
             dateEnd = "";
         } else {
-            dateEnd = getInfoFromDB(certifs, "cv24:datefin=", ",");
+            dateEnd = getInfoFromDB(certifs, "cv24:datefin=", "}");
         }
         String result = """
                \t<cv24:certif>
