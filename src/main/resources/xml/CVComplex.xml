@@ -1,0 +1,53 @@
+<cv24:cv24 xmlns:cv24="http://univ.fr/cv24">
+    <cv24:identite>
+        <cv24:genre>Mrs</cv24:genre>
+        <cv24:nom>STRING</cv24:nom>
+        <cv24:prenom>string</cv24:prenom>
+        <!--Optional:-->
+        <cv24:tel>+33 1 25 36 99 99</cv24:tel>
+        <!--Optional:-->
+        <cv24:mel>a@a.fr</cv24:mel>
+    </cv24:identite>
+    <cv24:objectif statut="stage">string</cv24:objectif>
+    <!--Optional:-->
+    <cv24:prof>
+        <!--1 or more repetitions:-->
+        <cv24:detail>
+            <cv24:datedeb>2024-01-18</cv24:datedeb>
+            <!--Optional:-->
+            <cv24:datefin>2024-02-18</cv24:datefin>
+            <cv24:titre>string</cv24:titre>
+        </cv24:detail>
+        <cv24:detail>
+            <cv24:datedeb>2024-01-18</cv24:datedeb>
+            <!--Optional:-->
+            <cv24:datefin>2024-02-18</cv24:datefin>
+            <cv24:titre>string2</cv24:titre>
+        </cv24:detail>
+    </cv24:prof>
+    <cv24:competences>
+        <!--1 to 5 repetitions:-->
+        <cv24:diplome niveau="3">
+            <cv24:date>2024-02-01</cv24:date>
+            <!--Optional:-->
+            <cv24:institut>string</cv24:institut>
+            <!--1 to 5 repetitions:-->
+            <cv24:titre>string</cv24:titre>
+        </cv24:diplome>
+        <!--Zero or more repetitions:-->
+        <cv24:certif>
+            <cv24:datedeb>2024-01-01</cv24:datedeb>
+            <!--Optional:-->
+            <cv24:datefin>2024-01-03</cv24:datefin>
+            <cv24:titre>string</cv24:titre>
+        </cv24:certif>
+    </cv24:competences>
+    <!--Optional:-->
+    <cv24:divers>
+        <!--1 to 5 repetitions:-->
+        <cv24:lv lang="fr" cert="CLES" nivs="C2" nivi="10"/>
+        <cv24:lv lang="en" cert="CLES" nivs="C2" nivi="15"/>
+        <!--0 to 3 repetitions:-->
+        <cv24:autre titre="string" comment="string"/>
+    </cv24:divers>
+</cv24:cv24>

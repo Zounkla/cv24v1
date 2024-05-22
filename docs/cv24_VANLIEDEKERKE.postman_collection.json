@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "903f70d6-8202-4fcf-af6a-27f7502b5631",
+		"name": "cv24_VANLIEDEKERKE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33746058"
+	},
+	"item": [
+		{
+			"name": "DELETE",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER_ADRESS}}/cv24/delete?id=0",
+					"host": [
+						"{{SERVER_ADRESS}}"
+					],
+					"path": [
+						"cv24",
+						"delete"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "INSERT",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">\r\n    <cv24:identite>\r\n        <cv24:genre>Mr</cv24:genre>\r\n        <cv24:nom>VANLIEDEKERKE</cv24:nom>\r\n        <cv24:prenom>ngaaa</cv24:prenom>\r\n        <cv24:mel>a@a.fr</cv24:mel>\r\n    </cv24:identite>\r\n    <cv24:objectif statut=\"stage\">string</cv24:objectif>\r\n    <cv24:prof>\r\n     \t <cv24:detail>\r\n      \t\t<cv24:datedeb>2024-01-18</cv24:datedeb>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t </cv24:detail>\r\n\t <cv24:detail>\r\n      \t\t<cv24:datedeb>2024-01-18</cv24:datedeb>\r\n    \t\t<cv24:datefin>2024-02-18</cv24:datefin>\r\n     \t\t<cv24:titre>string2</cv24:titre>\r\n\t </cv24:detail>\r\n\r\n    </cv24:prof>\r\n    <cv24:competences>\r\n     \t<cv24:diplome niveau=\"3\">\r\n     \t\t<cv24:date>2024-02-01</cv24:date>\r\n    \t\t<cv24:institut>string</cv24:institut>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t</cv24:diplome>\r\n\t<cv24:diplome niveau=\"3\">\r\n     \t\t<cv24:date>2024-02-01</cv24:date>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t</cv24:diplome>\r\n\r\n     \t<cv24:certif>\r\n     \t\t<cv24:datedeb>2024-01-01</cv24:datedeb>\r\n    \t\t<cv24:datefin>2024-11-03</cv24:datefin>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t</cv24:certif>\r\n\r\n    </cv24:competences>\r\n    <cv24:divers>\r\n        <cv24:lv lang=\"fr\" cert=\"CLES\" nivs=\"C2\" nivi=\"10\"/>\r\n        <cv24:autre titre=\"string\" comment=\"string\"/>\r\n    </cv24:divers>\r\n</cv24:cv24>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": "{{SERVER_ADRESS}}/cv24/insert"
+			},
+			"response": []
+		},
+		{
+			"name": "INSERT invalid CV",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<cv24:cv24 xmlns:cv24=\"http://univ.fr/cv24\">\r\n    <cv24:identite>\r\n        <cv24:genre>Mr</cv24:genre>\r\n        <cv24:nom>VANLIEDEKERKE</cv24:nom>\r\n        <cv24:prenom>Florian</cv24:prenom>\r\n        <cv24:mel>a@a.fr</cv24:mel>\r\n    </cv24:identite>\r\n    <cv24:prof>\r\n     \t <cv24:detail>\r\n      \t\t<cv24:datedeb>2024-01-18</cv24:datedeb>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t </cv24:detail>\r\n\t <cv24:detail>\r\n      \t\t<cv24:datedeb>2024-01-18</cv24:datedeb>\r\n    \t\t<cv24:datefin>2024-02-18</cv24:datefin>\r\n     \t\t<cv24:titre>string2</cv24:titre>\r\n\t </cv24:detail>\r\n\r\n    </cv24:prof>\r\n    <cv24:competences>\r\n     \t<cv24:diplome niveau=\"3\">\r\n     \t\t<cv24:date>2024-02-01</cv24:date>\r\n    \t\t<cv24:institut>string</cv24:institut>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t</cv24:diplome>\r\n\t<cv24:diplome niveau=\"3\">\r\n     \t\t<cv24:date>2024-02-01</cv24:date>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t</cv24:diplome>\r\n\r\n     \t<cv24:certif>\r\n     \t\t<cv24:datedeb>2024-01-01</cv24:datedeb>\r\n    \t\t<cv24:datefin>2024-11-03</cv24:datefin>\r\n     \t\t<cv24:titre>string</cv24:titre>\r\n\t</cv24:certif>\r\n\r\n    </cv24:competences>\r\n    <cv24:divers>\r\n        <cv24:lv lang=\"fr\" cert=\"CLES\" nivs=\"C2\" nivi=\"10\"/>\r\n        <cv24:autre titre=\"string\" comment=\"string\"/>\r\n    </cv24:divers>\r\n</cv24:cv24>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": "{{SERVER_ADRESS}}/cv24/insert"
+			},
+			"response": []
+		},
+		{
+			"name": "HOMEPAGE",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{SERVER_ADRESS}}"
+			},
+			"response": []
+		},
+		{
+			"name": "HELP",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{SERVER_ADRESS}}/help"
+			},
+			"response": []
+		},
+		{
+			"name": "RESUME XML",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{SERVER_ADRESS}}/cv24/resume/xml"
+			},
+			"response": []
+		},
+		{
+			"name": "RESUME HTML",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{SERVER_ADRESS}}/cv24/resume"
+			},
+			"response": []
+		},
+		{
+			"name": "DETAIL XML",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SERVER_ADRESS}}/cv24/xml?id=1",
+					"host": [
+						"{{SERVER_ADRESS}}"
+					],
+					"path": [
+						"cv24",
+						"xml"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DETAIL HTML",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SERVER_ADRESS}}/cv24/html?id=1",
+					"host": [
+						"{{SERVER_ADRESS}}"
+					],
+					"path": [
+						"cv24",
+						"html"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "SERVER_ADRESS",
+			"value": "https://cv24-vanliedekerke.cleverapps.io.cleverapps.io",
+			"type": "string"
+		}
+	]
+}

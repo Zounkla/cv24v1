@@ -608,6 +608,9 @@ public class CVService {
                         "cv24:cv24.cv24:competences.cv24:certif"),
                 Projections.excludeId());
         String certifs = collection.find(filter).projection(projection).first().toString();
+        if (!certifs.contains("cv24:certif")) {
+            return "";
+        }
         if (certifs.contains("[")) {
             certifs = certifs.substring(certifs.indexOf("certif=[") + "certif=[".length(),
                     certifs.indexOf("]"));
@@ -731,7 +734,7 @@ public class CVService {
         if (!lvs.startsWith(" nivi=")) {
             nivi = "";
         } else {
-            nivi = getInfoFromDB(lvs, "nivi=", ",");
+            nivi = getInfoFromDB(lvs, "nivi=", "}");
         }
         String result = "<cv24:lv lang=\"" + lang + "\" " + "cert=\"" + cert + "\" ";
         if (!nivs.isEmpty()) {
@@ -756,6 +759,9 @@ public class CVService {
                         "cv24:cv24.cv24:divers.cv24:autre"),
                 Projections.excludeId());
         String others = collection.find(filter).projection(projection).first().toString();
+        if (!others.contains("cv24:autre")) {
+            return "";
+        }
         if (others.contains("[")) {
             others = others.substring(others.indexOf("autre=[") + "autre=[".length(),
                     others.indexOf("]"));
